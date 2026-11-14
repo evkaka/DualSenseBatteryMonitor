@@ -7,19 +7,24 @@
         mc:Ignorable="d"
         Title="DualSense Battery Monitor" Height="400" Width="200" WindowStartupLocation="Manual" Loaded="Window_Loaded"
         Left="0" Top="0" Foreground="White" Background="Transparent" WindowStyle="None" SnapsToDevicePixels="True" Topmost="True" Focusable="False" IsHitTestVisible="False" IsTabStop="False" ResizeMode="NoResize" ShowInTaskbar="False" Icon="/icons/window/BatteryMonitor.ico" ShowActivated="False" AllowsTransparency="True">
-    <Grid>
+      <Grid>
+        <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="0.85" ScaleY="0.85"/>
+        </Grid.LayoutTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="11*"/>
             <RowDefinition Height="89*"/>
         </Grid.RowDefinitions>
-        <Border BorderThickness="1,1,0,1" CornerRadius="20,0,0,20" SnapsToDevicePixels="True" ClipToBounds="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.RowSpan="2">
+        <Border BorderThickness="0" CornerRadius="28,0,0,28" SnapsToDevicePixels="True" ClipToBounds="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.RowSpan="2">
             <Border.Background>
-                <LinearGradientBrush x:Name="gradient_background" EndPoint="0,0" StartPoint="1,1" SpreadMethod="Pad">
-                    <GradientStop Color="#FF00439C" Offset="0"/>
-                    <GradientStop Color="#FF1F1F1F" Offset="1"/>
+                <LinearGradientBrush x:Name="gradient_background" StartPoint="0,0.5" EndPoint="1,0.5" SpreadMethod="Pad">
+                    <GradientStop Color="#EB13151A" Offset="0.0"/>
+                    <GradientStop Color="#C8181B22" Offset="0.55"/>
+                    <GradientStop Color="#26181B22" Offset="1.0"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <ListBox x:Name="flowLayout_controller" Grid.Row="1" Grid.Column="4" Foreground="White" Focusable="False" IsTextSearchEnabled="False" ClipToBounds="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderBrush="{x:Null}" Background="{x:Null}" Margin="15,0,0,0"></ListBox>
+            <ListBox x:Name="flowLayout_controller" Grid.Row="1" Grid.Column="4" Foreground="White" Focusable="False" IsTextSearchEnabled="False" ClipToBounds="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderBrush="{x:Null}" Background="{x:Null}" Margin="12,0,0,0"></ListBox>
         </Border>
     </Grid>
 </Window>
+
