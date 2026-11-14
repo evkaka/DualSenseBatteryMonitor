@@ -313,7 +313,7 @@ namespace DualSenseBatteryMonitor
 			color_player_04.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#ff00ff"), 0.0));
 			color_player_04.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#990099"), 1.0));
 			color_player_04.Freeze();
-			playerColors = new List { color_player_01, color_player_02, color_player_03, color_player_04 };
+			playerColors = new List<Brush> { color_player_01, color_player_02, color_player_03, color_player_04 };
 			}
 			private void UpdateBatteryAnim(int batterylevel, bool isCharging)
 			{
