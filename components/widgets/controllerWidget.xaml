@@ -1,13 +1,13 @@
 ﻿<Page x:Class="DualSenseBatteryMonitor.controllerWidget"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DualSenseBatteryMonitor"
       mc:Ignorable="d" 
       d:DesignHeight="125" d:DesignWidth="250"
       Title="controllerWidget" Focusable="False" Width="250" Height="125" ScrollViewer.VerticalScrollBarVisibility="Disabled" ClipToBounds="True" IsHitTestVisible="False">
-           <Page.Resources>
+        <Page.Resources>
         <Storyboard x:Key="BlinkStoryboard" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
             <DoubleAnimation Storyboard.TargetName="ps5_hud_container" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
             <DoubleAnimation Storyboard.TargetName="text_battery_level_alt" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
@@ -35,13 +35,13 @@
                     <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.0" StrokeLineJoin="Round" Fill="Transparent"
                           Data="M 47,16 L 51,42 C 52,45 55,47 59,47 L 81,47 C 85,47 88,45 89,42 L 93,16"/>
                     <!-- Griff-Trennlinien -->
-                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeLinecap="round" Fill="Transparent"
+                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"
                           Data="M 33,22 C 26,38 22,64 25,91 M 107,22 C 114,38 118,64 115,91"/>
                     <!-- Analogsticks -->
                     <Ellipse Canvas.Left="43" Canvas.Top="52" Width="16" Height="16" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2"/>
                     <Ellipse Canvas.Left="81" Canvas.Top="52" Width="16" Height="16" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2"/>
                     <!-- D-Pad (Steuerkreuz) -->
-                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeLinecap="round" Fill="Transparent"
+                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"
                           Data="M 33,29 L 33,45 M 25,37 L 41,37"/>
                     <!-- Aktionstasten (4 Kreise) -->
                     <Ellipse Canvas.Left="104" Canvas.Top="27" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
@@ -49,8 +49,8 @@
                     <Ellipse Canvas.Left="97" Canvas.Top="34" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
                     <Ellipse Canvas.Left="111" Canvas.Top="34" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
                     <!-- PS-Taste & Mute-Strich -->
-                    <Line X1="63" Y1="53" X2="77" Y2="53" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeLinecap="round"/>
-                    <Line X1="66" Y1="67" X2="74" Y2="67" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeLinecap="round"/>
+                    <Line X1="63" Y1="53" X2="77" Y2="53" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                    <Line X1="66" Y1="67" X2="74" Y2="67" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                 </Canvas>
             </Viewbox>
 
@@ -98,7 +98,7 @@
 
         <TextBlock x:Name="count_index" HorizontalAlignment="Left" Margin="22,10,0,0" Text="1" VerticalAlignment="Top" FontSize="13" FontWeight="Bold" FontFamily="Artifakt Element Black" IsHitTestVisible="False" Foreground="White" Opacity="0.75"/>
 
-        <Image x:Name="image_controller_icon" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource controller_DualSenseDrawingImage}"/>
+                <Image x:Name="image_controller_icon" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource controller_DualSenseDrawingImage}"/>
         <Image x:Name="icon_battery" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource battery_emptyDrawingImage}"/>
         <Image x:Name="icon_charging" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource chargingDrawingImage}"/>
         <Image x:Name="icon_charging_alt" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource chargingDrawingImage}"/>
