@@ -219,10 +219,11 @@ namespace DualSenseBatteryMonitor
             bar_4.Fill = activeBrush;
             text_battery_level_alt.Foreground = activeBrush;
 			text_battery_level_altPerc.Foreground = activeBrush;
-			bar_1.Visibility = batterylevel > 0 || isCharging ? Visibility.Visible : Visibility.Hidden;
-			bar_2.Visibility = batterylevel > 25 ? Visibility.Visible : Visibility.Hidden;
-			bar_3.Visibility = batterylevel > 50 ? Visibility.Visible : Visibility.Hidden;
-			bar_4.Visibility = batterylevel > 75 ? Visibility.Visible : Visibility.Hidden;
+			bar_4.Visibility = batterylevel > 0 || isCharging ? Visibility.Visible : Visibility.Hidden;
+			bar_3.Visibility = batterylevel > 25 ? Visibility.Visible : Visibility.Hidden;
+			bar_2.Visibility = batterylevel > 50 ? Visibility.Visible : Visibility.Hidden;
+			bar_1.Visibility = batterylevel > 75 ? Visibility.Visible : Visibility.Hidden;
+
 		if (isCharging)
 		{
 			if (!isPlayingChargingAnim)
