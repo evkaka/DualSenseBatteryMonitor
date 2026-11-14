@@ -14,7 +14,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Publish Release
-        run: dotnet publish -c Release -r win-x64 --self-contained false -o ./publish
+        run: dotnet publish DualSenseBatteryMonitor.csproj -c Release -r win-x86 --self-contained false -o ./publish
       - name: Upload EXE Artifact
         uses: actions/upload-artifact@v4
         with:
