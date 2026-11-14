@@ -210,7 +210,7 @@ namespace DualSenseBatteryMonitor
             bool isCritical = batterylevel <= lowBatteryThreshold && !isCharging;
             SolidColorBrush activeBrush = isCritical ? HudCriticalRedBrush : HudWhiteBrush;
 
-            ps5_controller_path.Fill = activeBrush;
+            ps5_controller_path.Stroke = activeBrush;
             ps5_battery_nub.Fill = activeBrush;
             ps5_battery_frame.BorderBrush = activeBrush;
             bar_1.Fill = activeBrush;

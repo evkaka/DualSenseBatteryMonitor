@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="125" d:DesignWidth="250"
       Title="controllerWidget" Focusable="False" Width="250" Height="125" ScrollViewer.VerticalScrollBarVisibility="Disabled" ClipToBounds="True" IsHitTestVisible="False">
-    <Page.Resources>
+           <Page.Resources>
         <Storyboard x:Key="BlinkStoryboard" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
             <DoubleAnimation Storyboard.TargetName="ps5_hud_container" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
             <DoubleAnimation Storyboard.TargetName="text_battery_level_alt" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
@@ -20,15 +20,41 @@
     </Page.Resources>
 
     <Grid ClipToBounds="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-        <Grid x:Name="ps5_hud_container" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="14,0,0,0" Height="74" Width="222">
-            <Viewbox Width="64" Height="48" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2,0,0,0">
-                <Canvas Width="120" Height="86">
-                    <Path x:Name="ps5_controller_path" Fill="#FFFFFFFF"
-                          Data="M 33,10 C 44,10 50,14 60,14 C 70,14 76,10 87,10 C 101,10 111,22 115,44 C 118,60 115,74 106,77 C 99,79 93,74 88,63 C 84,55 78,51 60,51 C 42,51 36,55 32,63 C 27,74 21,79 14,77 C 5,74 2,60 5,44 C 9,22 19,10 33,10 Z"/>
-                    <Rectangle Canvas.Left="51" Canvas.Top="33" Width="18" Height="5" RadiusX="1.5" RadiusY="1.5" Fill="#FF121316"/>
+        <!-- Zentrierter PS5 HUD Container -->
+        <Grid x:Name="ps5_hud_container" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12,0,0,0" Height="74" Width="212">
+            <!-- Links: Dezentes DualSense Line-Art Piktogramm -->
+            <Viewbox Width="70" Height="52" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0">
+                <Canvas Width="140" Height="104">
+                    <!-- Schultertasten L1/R1 -->
+                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2" StrokeLineJoin="Round" Fill="Transparent"
+                          Data="M 24,18 C 28,12 40,12 46,16 M 116,18 C 112,12 100,12 94,16"/>
+                    <!-- Äußere DualSense Silhouette -->
+                    <Path x:Name="ps5_controller_path" Stroke="#FFFFFFFF" StrokeThickness="4.2" StrokeLineJoin="Round" Fill="#14FFFFFF"
+                          Data="M 46,16 C 56,15 84,15 94,16 C 110,18 122,30 127,54 C 131,74 128,90 117,93 C 108,95 101,88 94,74 C 89,64 82,60 70,60 C 58,60 51,64 46,74 C 39,88 32,95 23,93 C 12,90 9,74 13,54 C 18,30 30,18 46,16 Z"/>
+                    <!-- Touchpad -->
+                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.0" StrokeLineJoin="Round" Fill="Transparent"
+                          Data="M 47,16 L 51,42 C 52,45 55,47 59,47 L 81,47 C 85,47 88,45 89,42 L 93,16"/>
+                    <!-- Griff-Trennlinien -->
+                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeLinecap="round" Fill="Transparent"
+                          Data="M 33,22 C 26,38 22,64 25,91 M 107,22 C 114,38 118,64 115,91"/>
+                    <!-- Analogsticks -->
+                    <Ellipse Canvas.Left="43" Canvas.Top="52" Width="16" Height="16" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2"/>
+                    <Ellipse Canvas.Left="81" Canvas.Top="52" Width="16" Height="16" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2"/>
+                    <!-- D-Pad (Steuerkreuz) -->
+                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeLinecap="round" Fill="Transparent"
+                          Data="M 33,29 L 33,45 M 25,37 L 41,37"/>
+                    <!-- Aktionstasten (4 Kreise) -->
+                    <Ellipse Canvas.Left="104" Canvas.Top="27" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
+                    <Ellipse Canvas.Left="104" Canvas.Top="41" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
+                    <Ellipse Canvas.Left="97" Canvas.Top="34" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
+                    <Ellipse Canvas.Left="111" Canvas.Top="34" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
+                    <!-- PS-Taste & Mute-Strich -->
+                    <Line X1="63" Y1="53" X2="77" Y2="53" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeLinecap="round"/>
+                    <Line X1="66" Y1="67" X2="74" Y2="67" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeLinecap="round"/>
                 </Canvas>
             </Viewbox>
 
+            <!-- Rechts: PS5 4-Balken Batterie + Grüner Ladeblitz -->
             <Canvas Width="116" Height="74" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="86,0,0,0">
                 <Rectangle x:Name="ps5_battery_nub" Canvas.Left="4" Canvas.Top="27" Width="6" Height="18" RadiusX="1.5" RadiusY="1.5" Fill="#FFFFFFFF"/>
 
@@ -61,15 +87,16 @@
             </Canvas>
         </Grid>
 
-        <TextBlock x:Name="text_drainstat_average" Text="~--h --m" FontSize="12" Opacity="0.65" VerticalAlignment="Top" Margin="105,6,0,0" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
-        <TextBlock x:Name="text_drainstat_left" Text="~--h --m" FontSize="12" Opacity="0.65" VerticalAlignment="Bottom" Margin="105,0,0,6" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
-        <TextBlock x:Name="text_drainstat_error" Text="ERROR 1200" FontSize="14" Opacity="0.6" VerticalAlignment="Top" Margin="105,6,0,0" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White" Visibility="Collapsed"/>
-        <TextBlock x:Name="text_drainstat_Deco02" Text="left" FontSize="12" Opacity="0.65" VerticalAlignment="Bottom" Margin="172,0,0,6" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
+        <!-- Optionale Stats & Prozenttexte -->
+        <TextBlock x:Name="text_drainstat_average" Text="~--h --m" FontSize="12" Opacity="0.65" VerticalAlignment="Top" Margin="115,6,0,0" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
+        <TextBlock x:Name="text_drainstat_left" Text="~--h --m" FontSize="12" Opacity="0.65" VerticalAlignment="Bottom" Margin="115,0,0,6" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
+        <TextBlock x:Name="text_drainstat_error" Text="ERROR 1200" FontSize="14" Opacity="0.6" VerticalAlignment="Top" Margin="115,6,0,0" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White" Visibility="Collapsed"/>
+        <TextBlock x:Name="text_drainstat_Deco02" Text="left" FontSize="12" Opacity="0.65" VerticalAlignment="Bottom" Margin="182,0,0,6" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
 
-        <TextBlock x:Name="text_battery_level_alt" Text="100" FontSize="13" Opacity="0.85" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextAlignment="Right" FontFamily="Artifakt Element Black" Foreground="White" Margin="32,0,0,6" Visibility="Collapsed"/>
-        <TextBlock x:Name="text_battery_level_altPerc" Text="%" FontSize="13" Opacity="0.85" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextAlignment="Left" FontFamily="Artifakt Element Black" Foreground="White" Margin="58,0,0,6" Visibility="Collapsed"/>
+        <TextBlock x:Name="text_battery_level_alt" Text="100" FontSize="13" Opacity="0.85" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextAlignment="Right" FontFamily="Artifakt Element Black" Foreground="White" Margin="44,0,0,6" Visibility="Collapsed"/>
+        <TextBlock x:Name="text_battery_level_altPerc" Text="%" FontSize="13" Opacity="0.85" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextAlignment="Left" FontFamily="Artifakt Element Black" Foreground="White" Margin="70,0,0,6" Visibility="Collapsed"/>
 
-        <TextBlock x:Name="count_index" HorizontalAlignment="Left" Margin="14,10,0,0" Text="1" VerticalAlignment="Top" FontSize="13" FontWeight="Bold" FontFamily="Artifakt Element Black" IsHitTestVisible="False" Foreground="White" Opacity="0.75"/>
+        <TextBlock x:Name="count_index" HorizontalAlignment="Left" Margin="22,10,0,0" Text="1" VerticalAlignment="Top" FontSize="13" FontWeight="Bold" FontFamily="Artifakt Element Black" IsHitTestVisible="False" Foreground="White" Opacity="0.75"/>
 
         <Image x:Name="image_controller_icon" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource controller_DualSenseDrawingImage}"/>
         <Image x:Name="icon_battery" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource battery_emptyDrawingImage}"/>
@@ -79,24 +106,7 @@
         <Image x:Name="icon_batterywarning" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource warningDrawingImage}"/>
         <ProgressBar x:Name="progressbar_battery" Width="1" Height="1" Visibility="Collapsed" Value="25"/>
 
-        <TextBlock x:Name="debug_errorcode_text" HorizontalAlignment="Left" Margin="105,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="32" TextAlignment="Center" Width="111" FontFamily="Artifakt Element Black" Height="45" IsHitTestVisible="False" Text="1111" FontStyle="Italic" Visibility="Collapsed">
-            <TextBlock.Foreground>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FFD86E6E"/>
-                    <GradientStop Color="#FFA20404" Offset="1"/>
-                </LinearGradientBrush>
-            </TextBlock.Foreground>
-            <TextBlock.Effect>
-                <DropShadowEffect/>
-            </TextBlock.Effect>
-        </TextBlock>
-        <TextBlock x:Name="debug_errorcode_text_text" HorizontalAlignment="Left" Margin="105,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="10" TextAlignment="Center" Width="111" FontFamily="Artifakt Element Black" Height="20" IsHitTestVisible="False" Text="ERROR" FontStyle="Italic" Visibility="Collapsed">
-            <TextBlock.Foreground>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FFD86E6E"/>
-                    <GradientStop Color="#FFA20404" Offset="1"/>
-                </LinearGradientBrush>
-            </TextBlock.Foreground>
-        </TextBlock>
+        <TextBlock x:Name="debug_errorcode_text" HorizontalAlignment="Left" Margin="115,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="32" TextAlignment="Center" Width="111" FontFamily="Artifakt Element Black" Height="45" IsHitTestVisible="False" Text="1111" FontStyle="Italic" Foreground="#FFA20404" Visibility="Collapsed"/>
+        <TextBlock x:Name="debug_errorcode_text_text" HorizontalAlignment="Left" Margin="115,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="10" TextAlignment="Center" Width="111" FontFamily="Artifakt Element Black" Height="20" IsHitTestVisible="False" Text="ERROR" FontStyle="Italic" Foreground="#FFA20404" Visibility="Collapsed"/>
     </Grid>
 </Page>
