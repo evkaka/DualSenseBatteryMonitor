@@ -8,42 +8,32 @@
       d:DesignHeight="125" d:DesignWidth="250"
       Title="controllerWidget" Focusable="False" Width="250" Height="125" ScrollViewer.VerticalScrollBarVisibility="Disabled" ClipToBounds="True" IsHitTestVisible="False">
     <Page.Resources>
-        <!-- Blinking storyboard for low battery warning -->
         <Storyboard x:Key="BlinkStoryboard" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
             <DoubleAnimation Storyboard.TargetName="ps5_hud_container" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
             <DoubleAnimation Storyboard.TargetName="text_battery_level_alt" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
             <DoubleAnimation Storyboard.TargetName="text_battery_level_altPerc" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
         </Storyboard>
 
-        <!-- Blinking storyboard for first bar while charging -->
         <Storyboard x:Key="ChargingBarBlinkStoryboard" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
             <DoubleAnimation Storyboard.TargetName="bar_1" Storyboard.TargetProperty="Opacity" From="1" To="0.15" Duration="0:0:0.55" AutoReverse="True" RepeatBehavior="Forever"/>
         </Storyboard>
     </Page.Resources>
 
     <Grid ClipToBounds="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-        <!-- PS5 HUD Design Container -->
         <Grid x:Name="ps5_hud_container" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="14,0,0,0" Height="74" Width="222">
-            <!-- Left: PS5 style gamepad silhouette -->
             <Viewbox Width="64" Height="48" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2,0,0,0">
                 <Canvas Width="120" Height="86">
-                    <!-- Main controller body -->
                     <Path x:Name="ps5_controller_path" Fill="#FFFFFFFF"
                           Data="M 33,10 C 44,10 50,14 60,14 C 70,14 76,10 87,10 C 101,10 111,22 115,44 C 118,60 115,74 106,77 C 99,79 93,74 88,63 C 84,55 78,51 60,51 C 42,51 36,55 32,63 C 27,74 21,79 14,77 C 5,74 2,60 5,44 C 9,22 19,10 33,10 Z"/>
-                    <!-- Touchpad slit cutout -->
                     <Rectangle Canvas.Left="51" Canvas.Top="33" Width="18" Height="5" RadiusX="1.5" RadiusY="1.5" Fill="#FF121316"/>
                 </Canvas>
             </Viewbox>
 
-            <!-- Right: PS5 4-Bar Battery + Green Charging Bolt -->
             <Canvas Width="116" Height="74" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="86,0,0,0">
-                <!-- Battery positive terminal (left nub) -->
                 <Rectangle x:Name="ps5_battery_nub" Canvas.Left="4" Canvas.Top="27" Width="6" Height="18" RadiusX="1.5" RadiusY="1.5" Fill="#FFFFFFFF"/>
 
-                <!-- Battery outer frame (rounded rectangle) -->
                 <Border x:Name="ps5_battery_frame" Canvas.Left="12" Canvas.Top="14" Width="86" Height="44"
                         CornerRadius="5" BorderThickness="4.5" BorderBrush="#FFFFFFFF" Background="Transparent">
-                    <!-- 4 Vertical Segment Bars (each 25%) -->
                     <Grid Margin="5,5,5,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -61,33 +51,26 @@
                     </Grid>
                 </Border>
 
-                <!-- Green Charging Bolt (bottom right, overlaps battery corner) -->
                 <Canvas x:Name="ps5_charging_bolt" Canvas.Left="76" Canvas.Top="31" Width="34" Height="42" Visibility="Collapsed">
-                    <!-- Dark cutout outline behind bolt so it pops cleanly over the battery frame -->
                     <Path Fill="#FF121316"
                           Data="M 19,0 L 3,23 L 15,23 L 11,42 L 31,18 L 19,18 Z"
                           Stroke="#FF121316" StrokeThickness="4" StrokeLineJoin="Round"/>
-                    <!-- Bright PS5 charging green bolt -->
                     <Path Fill="#FF1CE885"
                           Data="M 19,0 L 3,23 L 15,23 L 11,42 L 31,18 L 19,18 Z"/>
                 </Canvas>
             </Canvas>
         </Grid>
 
-        <!-- Optional Battery drain stats (respects user settings) -->
         <TextBlock x:Name="text_drainstat_average" Text="~--h --m" FontSize="12" Opacity="0.65" VerticalAlignment="Top" Margin="105,6,0,0" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
         <TextBlock x:Name="text_drainstat_left" Text="~--h --m" FontSize="12" Opacity="0.65" VerticalAlignment="Bottom" Margin="105,0,0,6" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
         <TextBlock x:Name="text_drainstat_error" Text="ERROR 1200" FontSize="14" Opacity="0.6" VerticalAlignment="Top" Margin="105,6,0,0" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White" Visibility="Collapsed"/>
         <TextBlock x:Name="text_drainstat_Deco02" Text="left" FontSize="12" Opacity="0.65" VerticalAlignment="Bottom" Margin="172,0,0,6" HorizontalAlignment="Left" TextAlignment="Center" FontFamily="Artifakt Element Black" Foreground="White"/>
 
-        <!-- Optional Percentage Text (if enabled in settings) -->
         <TextBlock x:Name="text_battery_level_alt" Text="100" FontSize="13" Opacity="0.85" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextAlignment="Right" FontFamily="Artifakt Element Black" Foreground="White" Margin="32,0,0,6" Visibility="Collapsed"/>
         <TextBlock x:Name="text_battery_level_altPerc" Text="%" FontSize="13" Opacity="0.85" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextAlignment="Left" FontFamily="Artifakt Element Black" Foreground="White" Margin="58,0,0,6" Visibility="Collapsed"/>
 
-        <!-- Player Index (subtle small badge if multiple controllers are used) -->
         <TextBlock x:Name="count_index" HorizontalAlignment="Left" Margin="14,10,0,0" Text="1" VerticalAlignment="Top" FontSize="13" FontWeight="Bold" FontFamily="Artifakt Element Black" IsHitTestVisible="False" Foreground="White" Opacity="0.75"/>
 
-        <!-- Hidden legacy elements kept so code-behind references remain 100% compatible -->
         <Image x:Name="image_controller_icon" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource controller_DualSenseDrawingImage}"/>
         <Image x:Name="icon_battery" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource battery_emptyDrawingImage}"/>
         <Image x:Name="icon_charging" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource chargingDrawingImage}"/>
@@ -96,7 +79,6 @@
         <Image x:Name="icon_batterywarning" Width="1" Height="1" Visibility="Collapsed" Source="{StaticResource warningDrawingImage}"/>
         <ProgressBar x:Name="progressbar_battery" Width="1" Height="1" Visibility="Collapsed" Value="25"/>
 
-        <!-- Error code display -->
         <TextBlock x:Name="debug_errorcode_text" HorizontalAlignment="Left" Margin="105,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="32" TextAlignment="Center" Width="111" FontFamily="Artifakt Element Black" Height="45" IsHitTestVisible="False" Text="1111" FontStyle="Italic" Visibility="Collapsed">
             <TextBlock.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -113,3 +95,8 @@
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FFD86E6E"/>
                     <GradientStop Color="#FFA20404" Offset="1"/>
+                </LinearGradientBrush>
+            </TextBlock.Foreground>
+        </TextBlock>
+    </Grid>
+</Page>
