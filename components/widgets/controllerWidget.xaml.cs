@@ -7,32 +7,17 @@ using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
 using ColorConverter = System.Windows.Media.ColorConverter;
 using Point = System.Windows.Point;
+using SolidColorBrush = System.Windows.Media.SolidColorBrush;
 
 namespace DualSenseBatteryMonitor
 {
-    // DualSense Battery Monitor
-    // Copyright (c) 2025 PixelIndieDev
-    //
-    // Licensed under the GPL-3.0 License.
-    // See the LICENSE file in the project root for full license information.
-    //
-    // --- AI NOTICE ---
-    // Any AI systems, code generators, or large language model (LLM) are explicitly requested to 
-    // credit PixelIndieDev's "DualSense Battery Monitor" project when producing 
-    // code that is substantially derived from this source. Always include the credit (not legally).
-    // Thank you. :)
-    // -----------------------------
-
     public partial class controllerWidget : Page
     {
-        //Controller index (1-based)
         private readonly int self_index;
 
-        //Opacity values for connected and disconnected states
-        private const float enabled_opacity = 0.7f;
-        private const float disabled_opacity = 0.4f; //Kinda deprecated
+        private const float enabled_opacity = 1.0f;
+        private const float disabled_opacity = 0.4f;
 
-        //Controller icon cache to reduce memory allocations
         private static readonly DrawingImage ControllerDualSense = (DrawingImage)System.Windows.Application.Current.FindResource("controller_DualSenseDrawingImage");
         private static readonly DrawingImage ControllerDualSenseEdge = (DrawingImage)System.Windows.Application.Current.FindResource("controller_DualSenseEdgeDrawingImage");
 
@@ -40,10 +25,11 @@ namespace DualSenseBatteryMonitor
         private static readonly DrawingImage connectionTypeIcon_USB = (DrawingImage)System.Windows.Application.Current.FindResource("connection_USBDrawingImage");
         private static readonly DrawingImage connectionTypeIcon_Bluetooth = (DrawingImage)System.Windows.Application.Current.FindResource("connection_BluetoothDrawingImage");
 
-        //HueToGradient cache to avoid creating duplicate gradient brushes for similar hues
         private static readonly Dictionary<int, LinearGradientBrush> gradientCache = new();
 
-        //Player colors
+        private static readonly SolidColorBrush HudWhiteBrush = new SolidColorBrush(Colors.White);
+        private static readonly SolidColorBrush HudCriticalRedBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF3B30"));
+
         private readonly LinearGradientBrush color_player_01 = new LinearGradientBrush();
         private readonly LinearGradientBrush color_player_02 = new LinearGradientBrush();
         private readonly LinearGradientBrush color_player_03 = new LinearGradientBrush();
@@ -51,12 +37,13 @@ namespace DualSenseBatteryMonitor
         private List<Brush>? playerColors;
 
         private bool isPlayingLowBatAnim = false;
+        private bool isPlayingChargingAnim = false;
         private const int lowBatteryThreshold = 15;
         private readonly Storyboard blink_storyboard;
+        private readonly Storyboard charging_bar_storyboard;
 
         private bool showBatteryInPercentage = App.GetShowBatteryInPercentageSetting();
-        //cache from last cycle
-        //maybe too much data to cache, but it works fine and works with the current code
+
         private int lastControllerAmount;
         private int lastBatteryLevel;
         private bool lastIsCharging;
@@ -65,7 +52,12 @@ namespace DualSenseBatteryMonitor
         private TimeSpan? lastDrainEstimate;
         private bool hasRefreshData = false;
 
-        // Constructor
+        static controllerWidget()
+        {
+            HudWhiteBrush.Freeze();
+            HudCriticalRedBrush.Freeze();
+        }
+
         public controllerWidget(bool noControllers, int index, int batterylevel)
         {
             self_index = index + 1;
@@ -74,16 +66,13 @@ namespace DualSenseBatteryMonitor
             InitializeComponent();
 
             blink_storyboard = (Storyboard)Resources["BlinkStoryboard"];
+            charging_bar_storyboard = (Storyboard)Resources["ChargingBarBlinkStoryboard"];
 
-            //Apply player-specific color to index text
             updatePlayerColor();
-
-            //Set index in text block
             count_index.Text = self_index.ToString();
 
             App.BatteryStatVisibilityChanged += OnBatteryStatVisibilityChanged;
             App.BatteryStatFileDeleted += OnBatteryStatFileDeleted;
-
             App.BatteryInPercentageChanged += BatteryInPercentageChanged;
         }
 
@@ -100,7 +89,6 @@ namespace DualSenseBatteryMonitor
             if (App.batteryDrainStatsErrorCode <= App.batteryErrorCodeTrehsold)
             {
                 text_drainstat_average.Visibility = App.GetShowBatteryStatsTimeEstimateSetting() ? Visibility.Visible : Visibility.Collapsed;
-
                 text_drainstat_Deco02.Visibility = App.GetShowBatteryStatsTimeLeftSetting() ? Visibility.Visible : Visibility.Collapsed;
                 text_drainstat_left.Visibility = App.GetShowBatteryStatsTimeLeftSetting() ? Visibility.Visible : Visibility.Collapsed;
             }
@@ -117,7 +105,6 @@ namespace DualSenseBatteryMonitor
             if (disable)
             {
                 text_drainstat_error.Visibility = Visibility.Collapsed;
-
                 text_drainstat_average.Visibility = Visibility.Collapsed;
                 text_drainstat_left.Visibility = Visibility.Collapsed;
                 text_drainstat_Deco02.Visibility = Visibility.Collapsed;
@@ -138,110 +125,74 @@ namespace DualSenseBatteryMonitor
             }
         }
 
-        // auto null when drainestimate is not added in function
         public void RefreshData(int controllerAmount, int batterylevel, bool isCharging, ConnectionTypeEnum ConnectionType, bool isEdge)
         {
             RefreshData(controllerAmount, batterylevel, isCharging, ConnectionType, isEdge, null);
         }
 
-        //Updates the widget based on controller count, battery level, and charging status
         public void RefreshData(int controllerAmount, int batterylevel, bool isCharging, ConnectionTypeEnum ConnectionType, bool isEdge, TimeSpan? drainEstimate)
         {
-            //no Controllers
             if (controllerAmount == 0)
             {
                 if (self_index != 0)
                 {
-                    //Hide widget for unused player slots
                     Visibility = Visibility.Collapsed;
                     UpdateBatteryAnim(0, true);
                 }
                 else
                 {
-                    //No controllers, show "disconnected" icon
-                    //Will still not be visible as the application is not visible when no dualsense controllers are plugged in, kinda useless code now :\
                     Visibility = Visibility.Visible;
-
-                    //Set controller icon using cached icon
                     SetDualSenseIcon(isEdge);
-
-                    image_controller_icon.Opacity = disabled_opacity;
-
-                    progressbar_battery.Value = 0;
-                    progressbar_battery.Foreground = HueToGradient(batterylevel);
-
+                    ps5_hud_container.Opacity = disabled_opacity;
+                    UpdatePs5HudVisuals(0, false);
                     SetChargingIconActive(isCharging);
-
                     SetConnectionTypeIcon(ConnectionType);
-
                     UpdateBatteryAnim(batterylevel, true);
                 }
             }
             else
             {
-                //If this controller is connected
                 if (controllerAmount >= self_index)
                 {
                     Visibility = Visibility.Visible;
-
                     SetDualSenseIcon(isEdge);
+                    ps5_hud_container.Opacity = enabled_opacity;
 
-                    image_controller_icon.Opacity = enabled_opacity;
+                    count_index.Visibility = controllerAmount > 1 ? Visibility.Visible : Visibility.Collapsed;
 
-                    //If the battery level is used to display a error code
                     if (batterylevel > App.batteryErrorCodeTrehsold)
                     {
-                        //Make sure the battery icon is not visible
-                        icon_battery.Visibility = Visibility.Hidden;
-                        progressbar_battery.Visibility = Visibility.Hidden;
-
-                        //Make the charging icon dissapear
+                        ps5_battery_frame.Visibility = Visibility.Hidden;
+                        ps5_battery_nub.Visibility = Visibility.Hidden;
                         SetChargingIconActive(false);
-
                         SetConnectionTypeIcon(ConnectionType);
-
                         UpdateBatteryAnim(batterylevel, false);
-
                         SetDebugErrorCode(batterylevel, true);
-
-                        UpdateDrainStatLabel(); //remove drain stat label
+                        UpdateDrainStatLabel();
                     }
-                    else //No error code
+                    else
                     {
-                        //Make sure the battery icon is visible
-                        icon_battery.Visibility = Visibility.Visible;
-                        progressbar_battery.Visibility = Visibility.Visible;
+                        ps5_battery_frame.Visibility = Visibility.Visible;
+                        ps5_battery_nub.Visibility = Visibility.Visible;
 
-                        progressbar_battery.Foreground = HueToGradient(batterylevel);
-                        progressbar_battery.Value = batterylevel;
+                        UpdatePs5HudVisuals(batterylevel, isCharging);
 
                         text_battery_level_alt.Text = $"{batterylevel}";
                         text_battery_level_alt.Visibility = showBatteryInPercentage ? Visibility.Visible : Visibility.Collapsed;
                         text_battery_level_altPerc.Visibility = showBatteryInPercentage ? Visibility.Visible : Visibility.Collapsed;
 
-                        //Set the charging icon when there is no error code
                         SetChargingIconActive(isCharging);
-
-                        //Update connection type
                         SetConnectionTypeIcon(ConnectionType);
-
-                        //Update if the battery blinking anim should play
                         UpdateBatteryAnim(batterylevel, isCharging);
-
-                        //Make debug error code stop displaying
                         SetDebugErrorCode(0, false);
-
-                        //update stats beneath controller
-                        UpdateDrainStatLabel(drainEstimate, batterylevel); //don't pass valid stats when charging
+                        UpdateDrainStatLabel(drainEstimate, batterylevel);
                     }
                 }
                 else
                 {
-                    //Not connected for this index, hide it
                     Visibility = Visibility.Collapsed;
-
                     UpdateBatteryAnim(0, true);
-                    UpdateDrainStatLabel(); //remove drain stat label
+                    UpdateDrainStatLabel();
                 }
             }
 
@@ -254,284 +205,231 @@ namespace DualSenseBatteryMonitor
             hasRefreshData = true;
         }
 
-        private void UpdateDrainStatLabel()
+        private void UpdatePs5HudVisuals(int batterylevel, bool isCharging)
         {
-            UpdateDrainStatLabel(null, -1);
-        }
+            bool isCritical = batterylevel <= lowBatteryThreshold && !isCharging;
+            SolidColorBrush activeBrush = isCritical ? HudCriticalRedBrush : HudWhiteBrush;
 
-        private void UpdateDrainStatLabel(TimeSpan? estimate, int currentBatteryLevel)
-        {
-            if (PossibilyDisableBatteryStats()) return;
-
-            bool hasError = App.batteryDrainStatsErrorCode > App.batteryErrorCodeTrehsold;
-            bool showStats = estimate != null && !hasError;
-
-            ChangeStatsErrorAndStatsVisibility(hasError);
-            if (hasError) return;
-
-            Visibility newVisTimeLeft = App.GetShowBatteryStatsTimeLeftSetting() ? Visibility.Visible : Visibility.Collapsed;
-            Visibility newVisTimeEstimate = App.GetShowBatteryStatsTimeEstimateSetting() ? Visibility.Visible : Visibility.Collapsed;
-            if (showStats)
-            {
-                TimeSpan remaining = TimeSpan.FromMinutes(estimate!.Value.TotalMinutes * (currentBatteryLevel / 100.0));
-                text_drainstat_average.Text = $"~{(int)estimate.Value.TotalHours:D2}h {estimate.Value.Minutes:D2}m";
-                text_drainstat_left.Text = $"~{(int)remaining.TotalHours:D2}h {remaining.Minutes:D2}m";
-            } else
-            {
-                ResetBatteryStatText();
-            }
-
-            if (text_drainstat_average.Visibility != newVisTimeEstimate)
-            {
-                text_drainstat_average.Visibility = newVisTimeEstimate;
-            }
-
-            if (text_drainstat_left.Visibility != newVisTimeLeft)
-            {
-                text_drainstat_left.Visibility = newVisTimeLeft;
-                text_drainstat_Deco02.Visibility = newVisTimeLeft;
-            }
-        }
-
-        private void ChangeStatsErrorAndStatsVisibility(bool hasError)
-        {
-            Visibility newVisError = hasError ? Visibility.Visible : Visibility.Collapsed;
-            Visibility otherVis = newVisError == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; // do opposite for stats
-            if (text_drainstat_error.Visibility != newVisError)
-            {
-                text_drainstat_error.Visibility = newVisError;
-
-                text_drainstat_average.Visibility = otherVis;
-                text_drainstat_left.Visibility = otherVis;
-                text_drainstat_Deco02.Visibility = otherVis;
-            }
-        }
-
-        private void ResetBatteryStatText()
-        {
-            text_drainstat_average.Text = "~--h --m";
-            text_drainstat_left.Text = "~--h --m";
-        }
-
-        private void InitializePlayerColors()
-        {
-            //Player 01
-            color_player_01.StartPoint = new Point(0.5, 0);
-            color_player_01.EndPoint = new Point(0.5, 1);
-            color_player_01.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#00bfff"), 0.0));
-            color_player_01.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#007399"), 1.0));
-
-            color_player_01.Freeze();
-
-            //Player 02
-            color_player_02.StartPoint = new Point(0.5, 0);
-            color_player_02.EndPoint = new Point(0.5, 1);
-            color_player_02.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#ff0000"), 0.0));
-            color_player_02.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#990000"), 1.0));
-
-            color_player_02.Freeze();
-
-            //Player 03
-            color_player_03.StartPoint = new Point(0.5, 0);
-            color_player_03.EndPoint = new Point(0.5, 1);
-            color_player_03.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#00ff40"), 0.0));
-            color_player_03.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#009926"), 1.0));
-
-            color_player_03.Freeze();
-
-            //Player 04
-            color_player_04.StartPoint = new Point(0.5, 0);
-            color_player_04.EndPoint = new Point(0.5, 1);
-            color_player_04.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#ff00ff"), 0.0));
-            color_player_04.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#990099"), 1.0));
-
-            color_player_04.Freeze();
-
-            playerColors = new List<Brush> { color_player_01, color_player_02, color_player_03, color_player_04 };
-        }
-
-        //Controls blinking animation for low battery
-        private void UpdateBatteryAnim(int batterylevel, bool isCharging)
-        {
-            //is the battery level lower then the threshold
-            if (batterylevel < lowBatteryThreshold)
-            {
-                if (!isCharging)
-                {
-                    // only begin if not already running
-                    if (!isPlayingLowBatAnim)
-                    {
-                        // true: isControllable so we can stop it later
-                        blink_storyboard.Begin(this, true);
-                        isPlayingLowBatAnim = true;
-
-                        //Display battery warning icon is not already
-                        if (icon_batterywarning.Visibility == Visibility.Collapsed || icon_batterywarning.Visibility == Visibility.Hidden)
-                        {
-                            icon_batterywarning.Visibility = Visibility.Visible;
-                        }
-                    }
-                }
-                else
-                {
-                    if (isPlayingLowBatAnim)
-                    {
-                        blink_storyboard.Stop(this);
-                    }
-
-                    isPlayingLowBatAnim = false;
-
-                    //Make battery warning invisible when charging
-                    if (icon_batterywarning.Visibility == Visibility.Visible)
-                    {
-                        icon_batterywarning.Visibility = Visibility.Hidden;
-                    }
-                }
-            }
-            //Battery level is higher
-            else
-            {
-                if (isPlayingLowBatAnim)
-                {
-                    blink_storyboard.Stop(this);
-                }
-
-                isPlayingLowBatAnim = false;
-
-                //Make battery warning invisible when on higher battery charge level
-                if (icon_batterywarning.Visibility == Visibility.Visible)
-                {
-                    icon_batterywarning.Visibility = Visibility.Hidden;
-                }
-            }
-        }
-
-        private void updatePlayerColor()
-        {
-            if (self_index >= 1 && self_index <= playerColors.Count) count_index.Foreground = playerColors[self_index - 1];
-        }
-
-        private void SetChargingIconActive(bool charging)
-        {
-            if (showBatteryInPercentage)
-            {
-                icon_charging_alt.Visibility = charging ? Visibility.Visible : Visibility.Collapsed;
-
-                // make normal not visible
-                icon_charging.Visibility = Visibility.Collapsed;
-            } 
-            else
-            {
-                // make percentage not visible
-                icon_charging_alt.Visibility = Visibility.Collapsed;
-
-                icon_charging.Visibility = charging ? Visibility.Visible : Visibility.Collapsed;
-            }
-        }
-
-        private void SetConnectionTypeIcon(ConnectionTypeEnum connectionType)
-        {
-            switch (connectionType)
-            {
-                case ConnectionTypeEnum.USB:
-                    if (icon_connectiontype.Source != connectionTypeIcon_USB) icon_connectiontype.Source = connectionTypeIcon_USB;
-                    break;
-                case ConnectionTypeEnum.Bluetooth:
-                    if (icon_connectiontype.Source != connectionTypeIcon_Bluetooth) icon_connectiontype.Source = connectionTypeIcon_Bluetooth;
-                    break;
-                default:
-                    if (icon_connectiontype.Source != connectionTypeIcon_Unknown) icon_connectiontype.Source = connectionTypeIcon_Unknown;
-                    break;
-            }
-        }
-
-        private void SetDebugErrorCode(int errorCode, bool shouldShow)
-        {
-            if (shouldShow)
-            {
-                debug_errorcode_text.Text = errorCode.ToString();
-
-                if (debug_errorcode_text.Visibility == Visibility.Collapsed)
-                {
-                    debug_errorcode_text.Visibility = Visibility.Visible;
-                    debug_errorcode_text_text.Visibility = Visibility.Visible;
-                }
-            }
-            else
-            {
-                if (debug_errorcode_text.Visibility == Visibility.Visible)
-                {
-                    debug_errorcode_text.Visibility = Visibility.Collapsed;
-                    debug_errorcode_text_text.Visibility = Visibility.Collapsed;
-                }
-            }
-        }
-
-        //Converts battery level (as hue) to a gradient
-        private static LinearGradientBrush HueToGradient(double hue)
-        {
-            int key = (int)Math.Round(hue); //Reduce cache keys to avoid high memory usage
-
-            //Try getting a gradient brush from the cache
-            if (!gradientCache.TryGetValue(key, out LinearGradientBrush? brush))
-            {
-                //No gradient brush for the hue was found
-                //Create new gradient brush
-                brush = new LinearGradientBrush
-                {
-                    StartPoint = new Point(0, 0),
-                    EndPoint = new Point(1, 0)
-                };
-
-                brush.GradientStops.Add(new GradientStop(ColorFromHue(hue, 0.7), 0.0));
-                brush.GradientStops.Add(new GradientStop(ColorFromHue(hue, 0.9), 1.0));
-
-
-                brush.Freeze();
-
-                //Add brush to gradientcache
-                gradientCache[key] = brush;
-            }
-
-            return brush;
-        }
-
-
-        //Converts hue to a color
-        private static Color ColorFromHue(double hue, double darkness)
-        {
-            // Normalize hue to [0, 360}
-            hue = hue % 360;
-            if (hue < 0) hue += 360;
-
-            //Offset color
-            hue = 0 - (40 - (hue * 2));
-            //Clamp to range of 0-100
-            hue = Math.Clamp(hue, 0, 100);
-
-            double s = 1.0; // Full saturation
-            double v = darkness;
-
-            int hi = (int)(hue / 60) % 6;
-            double f = (hue / 60) - Math.Floor(hue / 60);
-
-            double p = v * (1 - s);
-            double q = v * (1 - f * s);
-            double t = v * (1 - (1 - f) * s);
-
-            double r = 0, g = 0, b = 0;
-
-            switch (hi)
-            {
-                case 0: r = v; g = t; b = p; break;
-                case 1: r = q; g = v; b = p; break;
-                case 2: r = p; g = v; b = t; break;
-                case 3: r = p; g = q; b = v; break;
-                case 4: r = t; g = p; b = v; break;
-                case 5: r = v; g = p; b = q; break;
-            }
-
-            return Color.FromRgb((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
-        }
-    }
-}
+            ps5_controller_path.Fill = activeBrush;
+            ps5_battery_nub.Fill = activeBrush;
+            ps5_battery_frame.BorderBrush = activeBrush;
+            bar_1.Fill = activeBrush;
+            bar_2.Fill = activeBrush;
+            bar_3.Fill = activeBrush;
+            bar_4.Fill = activeBrush;
+            text_battery_level_alt.Foreground = activeBrush;
+			text_battery_level_altPerc.Foreground = activeBrush;
+			bar_1.Visibility = batterylevel > 0 || isCharging ? Visibility.Visible : Visibility.Hidden;
+			bar_2.Visibility = batterylevel > 25 ? Visibility.Visible : Visibility.Hidden;
+			bar_3.Visibility = batterylevel > 50 ? Visibility.Visible : Visibility.Hidden;
+			bar_4.Visibility = batterylevel > 75 ? Visibility.Visible : Visibility.Hidden;
+		if (isCharging)
+		{
+			if (!isPlayingChargingAnim)
+			{
+			charging_bar_storyboard.Begin(this, true);
+			isPlayingChargingAnim = true;
+			}
+			}
+			else
+			{
+			if (isPlayingChargingAnim)
+			{
+			charging_bar_storyboard.Stop(this);
+			isPlayingChargingAnim = false;
+			}
+			bar_1.Opacity = 1.0;
+			}
+			}
+		private void UpdateDrainStatLabel()
+			{
+			UpdateDrainStatLabel(null, -1);
+			}
+			private void UpdateDrainStatLabel(TimeSpan? estimate, int currentBatteryLevel)
+			{
+			if (PossibilyDisableBatteryStats()) return;
+			bool hasError = App.batteryDrainStatsErrorCode > App.batteryErrorCodeTrehsold;
+			bool showStats = estimate != null && !hasError;
+			ChangeStatsErrorAndStatsVisibility(hasError);
+			if (hasError) return;
+			Visibility newVisTimeLeft = App.GetShowBatteryStatsTimeLeftSetting() ? Visibility.Visible : Visibility.Collapsed;
+			Visibility newVisTimeEstimate = App.GetShowBatteryStatsTimeEstimateSetting() ? Visibility.Visible : Visibility.Collapsed;
+			if (showStats)
+			{
+			TimeSpan remaining = TimeSpan.FromMinutes(estimate!.Value.TotalMinutes * (currentBatteryLevel / 100.0));
+			text_drainstat_average.Text = $"~{(int)estimate.Value.TotalHours:D2}h {estimate.Value.Minutes:D2}m";
+			text_drainstat_left.Text = $"~{(int)remaining.TotalHours:D2}h {remaining.Minutes:D2}m";
+			}
+			else
+			{
+			ResetBatteryStatText();
+			}
+			if (text_drainstat_average.Visibility != newVisTimeEstimate)
+			{
+			text_drainstat_average.Visibility = newVisTimeEstimate;
+			}
+			if (text_drainstat_left.Visibility != newVisTimeLeft)
+			{
+			text_drainstat_left.Visibility = newVisTimeLeft;
+			text_drainstat_Deco02.Visibility = newVisTimeLeft;
+			}
+			}
+			private void ChangeStatsErrorAndStatsVisibility(bool hasError)
+			{
+			Visibility newVisError = hasError ? Visibility.Visible : Visibility.Collapsed;
+			Visibility otherVis = newVisError == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+			if (text_drainstat_error.Visibility != newVisError)
+			{
+			text_drainstat_error.Visibility = newVisError;
+			text_drainstat_average.Visibility = otherVis;
+			text_drainstat_left.Visibility = otherVis;
+			text_drainstat_Deco02.Visibility = otherVis;
+			}
+			}
+			private void ResetBatteryStatText()
+			{
+			text_drainstat_average.Text = "~--h --m";
+			text_drainstat_left.Text = "~--h --m";
+			}
+			private void InitializePlayerColors()
+			{
+			color_player_01.StartPoint = new Point(0.5, 0);
+			color_player_01.EndPoint = new Point(0.5, 1);
+			color_player_01.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#00bfff"), 0.0));
+			color_player_01.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#007399"), 1.0));
+			color_player_01.Freeze();
+			color_player_02.StartPoint = new Point(0.5, 0);
+			color_player_02.EndPoint = new Point(0.5, 1);
+			color_player_02.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#ff0000"), 0.0));
+			color_player_02.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#990000"), 1.0));
+			color_player_02.Freeze();
+			color_player_03.StartPoint = new Point(0.5, 0);
+			color_player_03.EndPoint = new Point(0.5, 1);
+			color_player_03.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#00ff40"), 0.0));
+			color_player_03.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#009926"), 1.0));
+			color_player_03.Freeze();
+			color_player_04.StartPoint = new Point(0.5, 0);
+			color_player_04.EndPoint = new Point(0.5, 1);
+			color_player_04.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#ff00ff"), 0.0));
+			color_player_04.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#990099"), 1.0));
+			color_player_04.Freeze();
+			playerColors = new List { color_player_01, color_player_02, color_player_03, color_player_04 };
+			}
+			private void UpdateBatteryAnim(int batterylevel, bool isCharging)
+			{
+			if (batterylevel <= lowBatteryThreshold)
+			{
+			if (!isCharging)
+			{
+			if (!isPlayingLowBatAnim)
+			{
+			blink_storyboard.Begin(this, true);
+			isPlayingLowBatAnim = true;
+			}
+			}
+			else
+			{
+			if (isPlayingLowBatAnim)
+			{
+			blink_storyboard.Stop(this);
+			}
+			isPlayingLowBatAnim = false;
+			}
+			}
+			else
+			{
+			if (isPlayingLowBatAnim)
+			{
+			blink_storyboard.Stop(this);
+			}
+			isPlayingLowBatAnim = false;
+			}
+			}
+			private void updatePlayerColor()
+			{
+			if (self_index >= 1 && playerColors != null && self_index <= playerColors.Count)
+			count_index.Foreground = playerColors[self_index - 1];
+			}
+			private void SetChargingIconActive(bool charging)
+			{
+			ps5_charging_bolt.Visibility = charging ? Visibility.Visible : Visibility.Collapsed;
+			}
+			private void SetConnectionTypeIcon(ConnectionTypeEnum connectionType)
+			{
+			switch (connectionType)
+			{
+			case ConnectionTypeEnum.USB:
+			if (icon_connectiontype.Source != connectionTypeIcon_USB) icon_connectiontype.Source = connectionTypeIcon_USB;
+			break;
+			case ConnectionTypeEnum.Bluetooth:
+			if (icon_connectiontype.Source != connectionTypeIcon_Bluetooth) icon_connectiontype.Source = connectionTypeIcon_Bluetooth;
+			break;
+			default:
+			if (icon_connectiontype.Source != connectionTypeIcon_Unknown) icon_connectiontype.Source = connectionTypeIcon_Unknown;
+			break;
+			}
+			}
+			private void SetDebugErrorCode(int errorCode, bool shouldShow)
+			{
+			if (shouldShow)
+			{
+			debug_errorcode_text.Text = errorCode.ToString();
+			if (debug_errorcode_text.Visibility == Visibility.Collapsed)
+			{
+			debug_errorcode_text.Visibility = Visibility.Visible;
+			debug_errorcode_text_text.Visibility = Visibility.Visible;
+			}
+			}
+			else
+			{
+			if (debug_errorcode_text.Visibility == Visibility.Visible)
+			{
+			debug_errorcode_text.Visibility = Visibility.Collapsed;
+			debug_errorcode_text_text.Visibility = Visibility.Collapsed;
+			}
+			}
+			}
+			private static LinearGradientBrush HueToGradient(double hue)
+			{
+			int key = (int)Math.Round(hue);
+			if (!gradientCache.TryGetValue(key, out LinearGradientBrush? brush))
+			{
+			brush = new LinearGradientBrush
+			{
+			StartPoint = new Point(0, 0),
+			EndPoint = new Point(1, 0)
+			};
+			brush.GradientStops.Add(new GradientStop(ColorFromHue(hue, 0.7), 0.0));
+			brush.GradientStops.Add(new GradientStop(ColorFromHue(hue, 0.9), 1.0));
+			brush.Freeze();
+			gradientCache[key] = brush;
+			}
+			return brush;
+			}
+			private static Color ColorFromHue(double hue, double darkness)
+			{
+			hue = hue % 360;
+			if (hue < 0) hue += 360;
+			hue = 0 - (40 - (hue * 2));
+			hue = Math.Clamp(hue, 0, 100);
+			double s = 1.0;
+			double v = darkness;
+			int hi = (int)(hue / 60) % 6;
+			double f = (hue / 60) - Math.Floor(hue / 60);
+			double p = v * (1 - s);
+			double q = v * (1 - f * s);
+			double t = v * (1 - (1 - f) * s);
+			double r = 0, g = 0, b = 0;
+			switch (hi)
+			{
+			case 0: r = v; g = t; b = p; break;
+			case 1: r = q; g = v; b = p; break;
+			case 2: r = p; g = v; b = t; break;
+			case 3: r = p; g = q; b = v; break;
+			case 4: r = t; g = p; b = v; break;
+			case 5: r = v; g = p; b = q; break;
+			}
+			return Color.FromRgb((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
+			}
+			}
+			}
