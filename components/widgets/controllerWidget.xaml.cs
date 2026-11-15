@@ -243,7 +243,7 @@ namespace DualSenseBatteryMonitor
             }
             else if (isCharging)
             {
-                if (batterylevel <= 25)
+                if (batterylevel < 25)
                 {
                     bar_4.Visibility = Visibility.Visible;
                     bar_3.Visibility = Visibility.Hidden;
@@ -251,7 +251,7 @@ namespace DualSenseBatteryMonitor
                     bar_1.Visibility = Visibility.Hidden;
                     targetStoryboardKey = "BlinkBar4";
                 }
-                else if (batterylevel <= 50)
+                else if (batterylevel < 50)
                 {
                     bar_4.Visibility = Visibility.Visible;
                     bar_3.Visibility = Visibility.Visible;
@@ -259,7 +259,7 @@ namespace DualSenseBatteryMonitor
                     bar_1.Visibility = Visibility.Hidden;
                     targetStoryboardKey = "BlinkBar3";
                 }
-                else if (batterylevel <= 75)
+                else if (batterylevel < 75)
                 {
                     bar_4.Visibility = Visibility.Visible;
                     bar_3.Visibility = Visibility.Visible;
@@ -279,9 +279,9 @@ namespace DualSenseBatteryMonitor
             else
             {
                 bar_4.Visibility = batterylevel > 0 ? Visibility.Visible : Visibility.Hidden;
-                bar_3.Visibility = batterylevel > 25 ? Visibility.Visible : Visibility.Hidden;
-                bar_2.Visibility = batterylevel > 50 ? Visibility.Visible : Visibility.Hidden;
-                bar_1.Visibility = batterylevel > 75 ? Visibility.Visible : Visibility.Hidden;
+                bar_3.Visibility = batterylevel >= 25 ? Visibility.Visible : Visibility.Hidden;
+                bar_2.Visibility = batterylevel >= 50 ? Visibility.Visible : Visibility.Hidden;
+                bar_1.Visibility = batterylevel >= 75 ? Visibility.Visible : Visibility.Hidden;
             }
 
             if (activeChargingStoryboardKey != targetStoryboardKey)
