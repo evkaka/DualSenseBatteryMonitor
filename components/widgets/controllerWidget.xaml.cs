@@ -279,9 +279,9 @@ namespace DualSenseBatteryMonitor
             else
             {
                 bar_4.Visibility = batterylevel > 0 ? Visibility.Visible : Visibility.Hidden;
-                bar_3.Visibility = batterylevel >= 25 ? Visibility.Visible : Visibility.Hidden;
-                bar_2.Visibility = batterylevel >= 50 ? Visibility.Visible : Visibility.Hidden;
-                bar_1.Visibility = batterylevel >= 75 ? Visibility.Visible : Visibility.Hidden;
+                bar_3.Visibility = batterylevel > 25 ? Visibility.Visible : Visibility.Hidden;
+                bar_2.Visibility = batterylevel > 50 ? Visibility.Visible : Visibility.Hidden;
+                bar_1.Visibility = batterylevel > 75 ? Visibility.Visible : Visibility.Hidden;
             }
 
             if (activeChargingStoryboardKey != targetStoryboardKey)
