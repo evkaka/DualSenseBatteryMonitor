@@ -9,7 +9,7 @@
         Left="0" Top="0" Foreground="White" Background="Transparent" WindowStyle="None" SnapsToDevicePixels="True" Topmost="True" Focusable="False" IsHitTestVisible="False" IsTabStop="False" ResizeMode="NoResize" ShowInTaskbar="False" Icon="/icons/window/BatteryMonitor.ico" ShowActivated="False" AllowsTransparency="True">
       <Grid>
         <Grid.LayoutTransform>
-            <ScaleTransform ScaleX="0.72" ScaleY="0.72"/>
+            <ScaleTransform ScaleX="0.65" ScaleY="0.65"/>
         </Grid.LayoutTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="11*"/>

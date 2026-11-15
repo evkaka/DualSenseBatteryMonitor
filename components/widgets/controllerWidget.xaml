@@ -7,17 +7,36 @@
       mc:Ignorable="d" 
       d:DesignHeight="125" d:DesignWidth="250"
       Title="controllerWidget" Focusable="False" Width="250" Height="125" ScrollViewer.VerticalScrollBarVisibility="Disabled" ClipToBounds="True" IsHitTestVisible="False">
-        <Page.Resources>
+    <Page.Resources>
         <Storyboard x:Key="BlinkStoryboard" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
             <DoubleAnimation Storyboard.TargetName="ps5_hud_container" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
             <DoubleAnimation Storyboard.TargetName="text_battery_level_alt" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
             <DoubleAnimation Storyboard.TargetName="text_battery_level_altPerc" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
         </Storyboard>
 
-        <Storyboard x:Key="ChargingBarBlinkStoryboard" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
+        <!-- Einzelne Blink-Animationen für jeden Ladebalken -->
+        <Storyboard x:Key="BlinkBar4" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
+            <DoubleAnimation Storyboard.TargetName="bar_4" Storyboard.TargetProperty="Opacity" From="1" To="0.15" Duration="0:0:0.55" AutoReverse="True" RepeatBehavior="Forever"/>
+        </Storyboard>
+        <Storyboard x:Key="BlinkBar3" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
+            <DoubleAnimation Storyboard.TargetName="bar_3" Storyboard.TargetProperty="Opacity" From="1" To="0.15" Duration="0:0:0.55" AutoReverse="True" RepeatBehavior="Forever"/>
+        </Storyboard>
+        <Storyboard x:Key="BlinkBar2" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
+            <DoubleAnimation Storyboard.TargetName="bar_2" Storyboard.TargetProperty="Opacity" From="1" To="0.15" Duration="0:0:0.55" AutoReverse="True" RepeatBehavior="Forever"/>
+        </Storyboard>
+        <Storyboard x:Key="BlinkBar1" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
             <DoubleAnimation Storyboard.TargetName="bar_1" Storyboard.TargetProperty="Opacity" From="1" To="0.15" Duration="0:0:0.55" AutoReverse="True" RepeatBehavior="Forever"/>
         </Storyboard>
+
+        <!-- Fertig-Signal: Alle 4 grünen Balken blinken gemeinsam im Warn-Takt (0.4s) -->
+        <Storyboard x:Key="BlinkAllBarsFull" RepeatBehavior="Forever" AutoReverse="True" Timeline.DesiredFrameRate="30">
+            <DoubleAnimation Storyboard.TargetName="bar_1" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
+            <DoubleAnimation Storyboard.TargetName="bar_2" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
+            <DoubleAnimation Storyboard.TargetName="bar_3" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
+            <DoubleAnimation Storyboard.TargetName="bar_4" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.4" AutoReverse="True" RepeatBehavior="Forever"/>
+        </Storyboard>
     </Page.Resources>
+
 
     <Grid ClipToBounds="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
         <!-- Zentrierter PS5 HUD Container -->

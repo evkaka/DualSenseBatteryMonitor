@@ -264,7 +264,7 @@ namespace DualSenseBatteryMonitor
                     controllerWidgetHeight = controllerWidget.Height;
                     controllerWidgetWidth = controllerWidget.Width;
 
-                    Width = (controllerWidget.Width + 24) * 0.72;
+                    Width = (controllerWidget.Width + 24) * 0.65;
                 }
 
                 double height = controllerWidget.Height;
@@ -649,7 +649,7 @@ namespace DualSenseBatteryMonitor
 
         private void UpdateWindowSize(int amount_children)
         {
-            Height = amount_children * (controllerWidgetHeight + 6) * 0.72;
+            Height = amount_children * (controllerWidgetHeight + 6) * 0.65;
         }
 
         private void ShouldShowWindow(bool lowBattery)
