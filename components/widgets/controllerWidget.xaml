@@ -23,36 +23,28 @@
         <!-- Zentrierter PS5 HUD Container -->
         <Grid x:Name="ps5_hud_container" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12,0,0,0" Height="74" Width="212">
             <!-- Links: Dezentes DualSense Line-Art Piktogramm -->
-            <Viewbox Width="70" Height="52" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0">
+            <Viewbox Width="68" Height="50" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0">
                 <Canvas Width="140" Height="104">
                     <!-- Schultertasten L1/R1 -->
-                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2" StrokeLineJoin="Round" Fill="Transparent"
-                          Data="M 24,18 C 28,12 40,12 46,16 M 116,18 C 112,12 100,12 94,16"/>
-                    <!-- Äußere DualSense Silhouette -->
-                    <Path x:Name="ps5_controller_path" Stroke="#FFFFFFFF" StrokeThickness="4.2" StrokeLineJoin="Round" Fill="#14FFFFFF"
+                    <Path Fill="{Binding ElementName=ps5_controller_path, Path=Fill}"
+                          Data="M 22,19 C 25,12 41,11 47,15 L 45,19 C 38,16 28,17 22,19 Z M 118,19 C 115,12 99,11 93,15 L 95,19 C 102,16 112,17 118,19 Z"/>
+                    <!-- Gefüllte DualSense-Außenform (färbt sich bei <=15% automatisch Rot) -->
+                    <Path x:Name="ps5_controller_path" Fill="#FFFFFFFF"
                           Data="M 46,16 C 56,15 84,15 94,16 C 110,18 122,30 127,54 C 131,74 128,90 117,93 C 108,95 101,88 94,74 C 89,64 82,60 70,60 C 58,60 51,64 46,74 C 39,88 32,95 23,93 C 12,90 9,74 13,54 C 18,30 30,18 46,16 Z"/>
-                    <!-- Touchpad -->
-                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.0" StrokeLineJoin="Round" Fill="Transparent"
-                          Data="M 47,16 L 51,42 C 52,45 55,47 59,47 L 81,47 C 85,47 88,45 89,42 L 93,16"/>
-                    <!-- Griff-Trennlinien -->
-                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"
-                          Data="M 33,22 C 26,38 22,64 25,91 M 107,22 C 114,38 118,64 115,91"/>
-                    <!-- Analogsticks -->
-                    <Ellipse Canvas.Left="43" Canvas.Top="52" Width="16" Height="16" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2"/>
-                    <Ellipse Canvas.Left="81" Canvas.Top="52" Width="16" Height="16" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="3.2"/>
-                    <!-- D-Pad (Steuerkreuz) -->
-                    <Path Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"
-                          Data="M 33,29 L 33,45 M 25,37 L 41,37"/>
-                    <!-- Aktionstasten (4 Kreise) -->
-                    <Ellipse Canvas.Left="104" Canvas.Top="27" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
-                    <Ellipse Canvas.Left="104" Canvas.Top="41" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
-                    <Ellipse Canvas.Left="97" Canvas.Top="34" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
-                    <Ellipse Canvas.Left="111" Canvas.Top="34" Width="5" Height="5" Fill="{Binding ElementName=ps5_controller_path, Path=Stroke}"/>
-                    <!-- PS-Taste & Mute-Strich -->
-                    <Line X1="63" Y1="53" X2="77" Y2="53" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                    <Line X1="66" Y1="67" X2="74" Y2="67" Stroke="{Binding ElementName=ps5_controller_path, Path=Stroke}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                    <!-- Markantes schwarzes DualSense-Mittelteil & Touchpad-Umrandung -->
+                    <Path Fill="#FF13151A"
+                          Data="M 46,16 L 50,43 C 51,46 54,48 58,48 L 82,48 C 86,48 89,46 90,43 L 94,16 L 97,16 L 93,44 C 92,48 88,51 83,51 L 96,76 C 92,66 84,60 70,60 C 56,60 48,66 44,76 L 57,51 C 52,51 48,48 47,44 L 43,16 Z"/>
+                    <!-- Analogsticks (dunkle Ringe mit weißem Kern) -->
+                    <Ellipse Canvas.Left="43" Canvas.Top="50" Width="17" Height="17" Fill="#FF13151A"/>
+                    <Ellipse Canvas.Left="46.5" Canvas.Top="53.5" Width="10" Height="10" Fill="{Binding ElementName=ps5_controller_path, Path=Fill}"/>
+                    <Ellipse Canvas.Left="80" Canvas.Top="50" Width="17" Height="17" Fill="#FF13151A"/>
+                    <Ellipse Canvas.Left="83.5" Canvas.Top="53.5" Width="10" Height="10" Fill="{Binding ElementName=ps5_controller_path, Path=Fill}"/>
+                    <!-- PS-Logo-Strich & Mute-Button in der Mitte -->
+                    <Rectangle Canvas.Left="65" Canvas.Top="52" Width="10" Height="2.5" RadiusX="1" RadiusY="1" Fill="#FF13151A"/>
+                    <Rectangle Canvas.Left="66.5" Canvas.Top="62" Width="7" Height="2.5" RadiusX="1" RadiusY="1" Fill="#FF13151A"/>
                 </Canvas>
             </Viewbox>
+
 
             <!-- Rechts: PS5 4-Balken Batterie + Grüner Ladeblitz -->
             <Canvas Width="116" Height="74" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="86,0,0,0">
