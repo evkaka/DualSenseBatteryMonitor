@@ -74,7 +74,7 @@ namespace DualSenseBatteryMonitor
         private byte isAppStartingUp = 1;
 
         // Low battery threshold
-        private const int lowBatteryThreshold = 25;
+        private const int lowBatteryThreshold = 15;
 
         // battery thresholds
         private const int batteryBluetoothTreshold = 4;
